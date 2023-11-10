@@ -1,5 +1,6 @@
 use clap::Parser;
 use crate::commands::Commands;
+use crate::config::E4EDMConfig;
 use std::error::Error;
 
 #[derive(Parser)]
@@ -7,40 +8,41 @@ use std::error::Error;
 #[command(propagate_version = true)]
 pub struct Cli {
     #[command(subcommand)]
-    pub command: Commands, 
-    // store config here
+    pub command: Commands,
 }
 
 impl Cli {
     pub fn exec(&self) -> Result<(),Box<dyn Error>> {
-        // probably want to load a config here
-        dbg!(&self.command);
-        // match &self.command {
-        //     Commands::InitDataset(args) => {
 
-        //     }
-        //     Commands::InitMission(args) => {
+        let config = E4EDMConfig::build().unwrap();
+        match &self.command {
+            Commands::InitDataset(args) => {
 
-        //     }
-        //     Commands::Add(args) => {
+            }
+            Commands::InitMission(args) => {
 
-        //     }
-        //     Commands::Activate => {
+            }
+            Commands::Add(args) => {
 
-        //     }
-        //     Commands::Status => {
+            }
+            Commands::Activate => {
 
-        //     }
-        //     Commands::Config => {
+            }
+            Commands::Status => {
+
+            }
+            Commands::Config => {
                 
-        //     }
-        //     Commands::Commit(args) => {
+            }
+            Commands::Commit(args) => {
 
-        //     }
-        //     Commands::Push(args) => {
+            }
+            Commands::Push(args) => {
 
-        //     }
-        // }
+            }
+        }
+
+        config.save();
         Ok(())
     }
 }

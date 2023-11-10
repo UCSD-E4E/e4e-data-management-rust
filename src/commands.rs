@@ -88,5 +88,6 @@ pub struct CommitArgs {
 
 #[derive(Args, Debug)]
 pub struct PushArgs {
+    /// Path to push dataset to
     pub path: Option<std::path::PathBuf>
 }
