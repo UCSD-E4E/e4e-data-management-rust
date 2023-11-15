@@ -1,24 +1,24 @@
-use clap::{Args, Subcommand};
 use chrono::{DateTime, FixedOffset};
+use clap::{Args, Subcommand};
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Initialize a dataset
-    InitDataset(InitDatasetArgs), 
+    InitDataset(InitDatasetArgs),
     /// Initialize a mission
-    InitMission(InitMissionArgs), 
+    InitMission(InitMissionArgs),
     /// Add files to the current mission
-    Add(AddArgs), 
+    Add(AddArgs),
     /// Switch to another active dataset
-    Activate, 
+    Activate,
     /// Display current status
     Status,
     /// Display values from config
     Config,
     /// Commit current list of files to mission
-    Commit(CommitArgs), 
+    Commit(CommitArgs),
     /// Push committed missions to specified directory
-    Push(PushArgs)
+    Push(PushArgs),
 }
 
 #[derive(Args, Debug)]
@@ -28,38 +28,38 @@ pub struct InitDatasetArgs {
     pub date: DateTime<FixedOffset>,
     /// Project name
     #[arg(long)]
-    pub project: String, 
+    pub project: String,
     /// Project location
     #[arg(long)]
-    pub location: String, 
+    pub location: String,
     /// Path of dataset, default is the e4edm data directory
     #[arg(long)]
-    pub path: Option<std::path::PathBuf>
+    pub path: Option<std::path::PathBuf>,
 }
 
 #[derive(Args, Debug)]
 pub struct InitMissionArgs {
     /// Timestamp of mission
     #[arg(long)]
-    pub timestamp: DateTime<FixedOffset>, 
+    pub timestamp: DateTime<FixedOffset>,
     /// Device used
     #[arg(long)]
-    pub device: String, 
+    pub device: String,
     /// Country where mission took place
     #[arg(long)]
-    pub country: String, 
+    pub country: String,
     /// Region where mission took place
     #[arg(long)]
-    pub region: String, 
+    pub region: String,
     /// Site where mission took place
     #[arg(long)]
-    pub site: String, 
+    pub site: String,
     /// Name of mission
     #[arg(long)]
-    pub name: String, 
+    pub name: String,
     /// Description of mission
     #[arg(long)]
-    pub message: Option<String>
+    pub message: Option<String>,
 }
 
 #[derive(Args, Debug)]
@@ -75,19 +75,19 @@ pub struct AddArgs {
     pub paths: Vec<std::path::PathBuf>,
     /// Readme
     #[arg(long)]
-    pub readme: Option<std::path::PathBuf>
+    pub readme: Option<std::path::PathBuf>,
 }
 
 #[derive(Args, Debug)]
 pub struct CommitArgs {
     /// Set if committing readme
-    // do we want to not do this? 
+    // do we want to not do this?
     #[arg(long)]
-    pub readme: bool
+    pub readme: bool,
 }
 
 #[derive(Args, Debug)]
 pub struct PushArgs {
     /// Path to push dataset to
-    pub path: Option<std::path::PathBuf>
+    pub path: Option<std::path::PathBuf>,
 }

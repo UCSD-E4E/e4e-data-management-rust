@@ -1,7 +1,7 @@
-use anyhow::Result;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
 use crate::dataset::Dataset;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -9,11 +9,11 @@ const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 #[derive(Debug, Serialize, Deserialize)]
 pub struct E4EDMConfig {
     config_path: std::path::PathBuf,
-    active_dataset: Option<String>, 
-    active_mission: Option<String>, 
-    datasets: HashMap<String, Dataset>, 
-    version: String, 
-    dataset_dir: Option<std::path::PathBuf>
+    active_dataset: Option<String>,
+    active_mission: Option<String>,
+    datasets: HashMap<String, Dataset>,
+    version: String,
+    dataset_dir: Option<std::path::PathBuf>,
 }
 
 impl E4EDMConfig {
@@ -29,10 +29,10 @@ impl E4EDMConfig {
         Ok(E4EDMConfig {
             config_path: std::path::PathBuf::new().join("."),
             active_dataset: None,
-            active_mission: None, 
+            active_mission: None,
             datasets: HashMap::new(),
             version: VERSION.to_string(),
-            dataset_dir: None
+            dataset_dir: None,
         })
     }
 }

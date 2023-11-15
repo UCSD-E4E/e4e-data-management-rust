@@ -1,9 +1,9 @@
-use chrono::DateTime;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
 use crate::manifest::Manifest;
 use chrono::serde::ts_seconds;
+use chrono::DateTime;
 use chrono::Utc;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Dataset {
@@ -22,26 +22,26 @@ pub struct Dataset {
     committed_files: Vec<std::path::PathBuf>,
     staged_files: Vec<std::path::PathBuf>,
     pushed: bool,
-    version: String
+    version: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Mission {
     path: std::path::PathBuf,
-    metadata: Metadata, 
+    metadata: Metadata,
     committed_files: Vec<std::path::PathBuf>,
     staged_files: Vec<std::path::PathBuf>,
-    manifest: Manifest
+    manifest: Manifest,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Metadata {
     #[serde(with = "ts_seconds")]
-    timestamp: DateTime<Utc>, 
-    device: String, 
+    timestamp: DateTime<Utc>,
+    device: String,
     country: String,
-    region: String, 
-    site: String, 
+    region: String,
+    site: String,
     name: String,
-    notes: String
+    notes: String,
 }
