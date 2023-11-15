@@ -1,0 +1,145 @@
+@startuml
+package "cli.py" <<file>> {
+    class Parameter {
+        name: str
+        getter: callable[[None], T]
+        setter: callable[[T], None]
+        parser: callable[[str], T]
+        formatter: callable[[T], str]
+        validator: callable[[T], bool]
+    }
+
+    class DataMangerCLI {
+        _log : logging.Logger
+        _app : DataManager
+        commands : List[str]
+        parameters : List[Parameter]
+        parser : argparse.ArgumentParser
+        
+        __init__(self)
+        init_mission_cmd(self, **kwargs) -> None
+        list_datasets_cmd(self) -> None
+        add_files_cmd(self, paths, readme, start, end, destination) -> None
+        status_cmd(self) -> None
+        main(self) -> None
+        __configure_*_parser(self, parser):
+    }
+}
+
+package "core.py" <<file>> {
+    class DataManager {
+        active_dataset: Optional[Dataset] = None
+        active_mission: Optional[Mission] = None // Why should DataManager have this? Would it not be better to control everything through Dataset class?
+        datasets: Dict[str, Dataset]
+        dirs: appdirs.AppDirs
+
+        load(cls : DataManager (?), *, config_dir : Optional[Path] = None) -> DataManager
+        save(self) -> None
+        initialize_dataset(self, date, project, location, directory)
+        initialize_mission(self, metadata : Metadata) -> None
+        status(self) -> str
+        add(self, paths: Iterable[Path], readme: bool = False, destination: Optional[Path] = None) -> None
+        commit(self, readme: bool = False) -> None
+        duplicate(self, paths: List[Path]) -> None
+        validate(self) -> bool
+        push(self, path: Path) -> None
+
+        zip(self, output_path: Path) -> None // Inactive
+        unzip(self, input_file: Path, output_path: Path) -> None // Inactive
+        list_datasets(self) -> List[str]
+        prune(self) -> None
+    }
+}
+
+package "data.py" <<file>> {
+    class StagedFile {
+        origin_path: Path
+        target_path: Path
+        hash: str
+        __hash__(self) -> int
+    }
+    class Manifest {
+        path: Path
+        root: Path
+        __init(self, path: Path, root: Optional[Path] = None)
+        validate(self, manifest: Dict[str, Dict[str, Union[str, int]]], files: Iterable[Path, *, method: str = 'hash', root: Optional[Path] = None) -> bool
+        get_dict(self) -> Dict[str, Dict[str, Union[str int]]
+        generate(self, files: Iterable[Path])
+        write(self, data: Dict[str, Dict[str, Union[str, uint]]], path: Optional[Path] = None) -> None
+        update(self, files: Iterable[Path])
+        compute_hashes(self, root: Path, files: Iterable[Path], hash_fn: Optional[Callable[[Path], str]] = None) -> Dict[str, Dict[str, Union[str, int]]]
+    }
+    class Mission {
+        __log : logging.Logger
+        path : Path
+        metadata: Metadata
+        committed_files: List[Path]
+        staged_files: Set[StagedFile]
+        manifest: Manifest
+        __init__(self, path: Path, mission_metadata: Metadata) -> None
+        create(self) -> None
+        get_files(self) -> Generator[Path, None, None]
+        load(cls, path: Path) -> Mission
+        stage(self, paths: Iterable[Path], destination: Optional[Path] = None)
+        name(self) -> str
+        commit(self) -> List[Path]
+    }  
+    class Dataset {
+        __log : logging.Logger
+        day_0 : dt.date
+        last_country: Optional[str] = None
+        last_region: Optional[str] = None
+        last_site: Optional[str] = None
+        countries: Set[str] = set()
+        regions: Set[str] = set()
+        sites: Set[str] = set()
+        devices: Set[str] = set()
+        missions: Dict[str, Mission] = {}
+        manifest = Manifest(self.root.joinpath(self.__MANIFEST_NAME))
+        committed_files: List[Path] = []
+        staged_files: List[Path] = []
+        pushed: bool = False
+
+        __init__(self, root: Path, day_0: dt.date):
+        load(cls, path: Path) -> Dataset
+        save(self, *, path: Optional[Path] = None)
+        get_files(self) -> Generator[Path, None, None]
+        get_new_files(self) -> Generator[Path, None, None]
+        add_mission(self, metadata: Metadata) -> Mission
+        create(self) -> None
+        name(self) -> str
+        validate(self) -> bool
+        stage(self, paths: Iterable[Path])
+        commit(self) -> List[Path]
+
+    }
+}
+
+package "metadata.py" <<file>> {
+    class Metadata {
+        timestamp: dt.datetime
+        device: str
+        country: str
+        region: str
+        site: str
+        mission: str
+        properties: Dict[str, Any] = field(default_factory=dict)
+        notes: str = ''
+        __post_init__(self)
+        write(self, directory: Path)
+        load(cls, directory: Path) -> Metadata
+    }
+}
+
+DataMangerCLI --o DataManager
+DataMangerCLI --o Parameter
+DataManager --o Mission
+DataManager --o Dataset
+
+Mission --o Manifest
+Mission --o Metadata
+Mission --o StagedFile
+
+Dataset --o Mission
+Dataset --o Manifest
+@enduml
