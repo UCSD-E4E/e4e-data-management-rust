@@ -5,11 +5,11 @@ mod config;
 mod dataset;
 mod manifest;
 
+use anyhow::Result;
 use cli::Cli;
-use std::error::Error;
 use clap::Parser;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     cli.exec()
 }

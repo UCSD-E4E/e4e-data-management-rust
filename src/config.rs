@@ -1,5 +1,5 @@
+use anyhow::Result;
 use serde::{Serialize, Deserialize};
-use std::error::Error;
 use std::collections::HashMap;
 use crate::dataset::Dataset;
 use std::fs;
@@ -17,7 +17,7 @@ pub struct E4EDMConfig {
 }
 
 impl E4EDMConfig {
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
+    pub fn save(&self) -> Result<()> {
         let config_str = toml::to_string(&self)?;
 
         let config_path_with_file = self.config_path.join("config");
@@ -25,7 +25,7 @@ impl E4EDMConfig {
         Ok(())
     }
 
-    pub fn build() -> Result<E4EDMConfig, Box<dyn Error>> {
+    pub fn build() -> Result<E4EDMConfig> {
         Ok(E4EDMConfig {
             config_path: std::path::PathBuf::new().join("."),
             active_dataset: None,

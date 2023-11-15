@@ -1,7 +1,7 @@
+use anyhow::Result;
 use clap::Parser;
 use crate::commands::Commands;
 use crate::config::E4EDMConfig;
-use std::error::Error;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -12,7 +12,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn exec(&self) -> Result<(),Box<dyn Error>> {
+    pub fn exec(&self) -> Result<()> {
 
         let config = E4EDMConfig::build().unwrap();
         match &self.command {
@@ -42,7 +42,7 @@ impl Cli {
             }
         }
 
-        config.save();
+        let _ = config.save();
         Ok(())
     }
 }
