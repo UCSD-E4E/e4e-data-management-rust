@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use chrono::{Datelike, Utc};
 use crate::{config::E4EDMConfig, dataset::build_dataset};
 use anyhow::{Result, bail};
+use dirs::config_dir;
 
 use super::InitDatasetArgs;
 
@@ -13,7 +14,7 @@ pub(crate) fn init_dataset(args: &InitDatasetArgs, config: &mut E4EDMConfig) -> 
         project = args.project,
         location = args.location
     );
-    let dataset_path = args.path.to_owned().unwrap_or(PathBuf::from(r"~")).join(dataset_name.clone());
+    let dataset_path = args.path.to_owned().unwrap_or(config_dir().unwrap()).join(dataset_name.clone());
 
     if config.datasets.contains_key(&dataset_name) {
         bail!("Dataset with that name already exists!");

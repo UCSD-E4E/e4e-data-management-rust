@@ -1,5 +1,4 @@
-use crate::commands::Commands;
-use crate::commands::init_dataset::init_dataset;
+use crate::commands::{Commands, init_dataset::init_dataset};
 use crate::config::E4EDMConfig;
 use anyhow::{Result, bail};
 use clap::Parser;
