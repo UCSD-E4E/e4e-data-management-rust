@@ -11,11 +11,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let version = option_env!("PROJECT_VERSION").unwrap_or(env!("CARGO_PKG_VERSION"));
     let git_output = Command::new("git").args(&["rev-parse", "HEAD"]).output().unwrap();
     let git_hash = String::from_utf8(git_output.stdout).unwrap();
-    let version_string = format!(
-"
+    write!(f, "
 version: {}
-git commit hash: {}build time: {}", version, git_hash, chrono::Local::now());
-    write!(f, "{}", version_string)?;
-
+git commit hash: {}build time: {}", version, git_hash, chrono::Local::now())?;
     Ok(())
 }
