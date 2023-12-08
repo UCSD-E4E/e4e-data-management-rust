@@ -4,6 +4,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::vec;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Dataset {
@@ -23,6 +24,27 @@ pub struct Dataset {
     staged_files: Vec<std::path::PathBuf>,
     pushed: bool,
     version: String,
+}
+
+pub fn build_dataset(root: std::path::PathBuf, day_0: DateTime<Utc>) -> Dataset {
+    let manifest_path = root.join("manifest.json");
+    Dataset {
+        root,
+        day_0,
+        last_country: None,
+        last_region: None,
+        last_site: None,
+        countries: vec![],
+        regions: vec![],
+        sites: vec![],
+        devices: vec![],
+        missions: HashMap::new(),
+        manifest: Manifest::new(manifest_path, None),
+        committed_files: vec![],
+        staged_files: vec![],
+        pushed: false,
+        version: "".to_string()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
