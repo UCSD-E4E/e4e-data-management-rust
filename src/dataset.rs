@@ -1,3 +1,4 @@
+use crate::commands::InitMissionArgs;
 use crate::manifest::Manifest;
 use chrono::serde::ts_seconds;
 use chrono::DateTime;
@@ -25,6 +26,33 @@ pub struct Dataset {
     staged_files: Vec<std::path::PathBuf>,
     pushed: bool,
     version: String,
+}
+
+impl Dataset {
+    pub fn add_mission(&mut self, metadata: Metadata) -> String {
+        let expedition_day = (metadata.timestamp - self.day_0).num_days();
+        let mission_path = self.root.clone()
+            .join(format!("ED-{expedition_day:02}"))
+            .join(metadata.name.to_string());
+
+        self.missions.insert(metadata.name.clone(), Mission {
+            path: mission_path.clone(),
+            metadata: metadata.clone(), 
+            committed_files: vec![],
+            staged_files: vec![],
+            manifest: Manifest::new(mission_path.join("manifest.json"), None)
+        });
+
+        self.countries.insert(metadata.country.clone());
+        self.last_country = Some(metadata.country);
+        self.regions.insert(metadata.region.clone());
+        self.last_region = Some(metadata.region);
+        self.sites.insert(metadata.site.clone());
+        self.last_site = Some(metadata.site);
+        self.devices.insert(metadata.device);
+
+        metadata.name
+    }
 }
 
 pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc>) -> Dataset {
@@ -57,8 +85,8 @@ struct Mission {
     manifest: Manifest,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Metadata {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Metadata {
     #[serde(with = "ts_seconds")]
     timestamp: DateTime<Utc>,
     device: String,
@@ -67,4 +95,27 @@ struct Metadata {
     site: String,
     name: String,
     notes: String,
+}
+
+pub fn build_metadata(
+    timestamp: DateTime<Utc>, 
+    device: String, 
+    country: String, 
+    region: String,
+    site: String,
+    name: String,
+    notes: String) -> Metadata {
+        Metadata { timestamp, device, country, region, site, name, notes }
+    }
+
+pub fn build_mission_metadata(args: &InitMissionArgs) -> Metadata {
+    build_metadata(
+        args.timestamp.into(), 
+        args.device.clone(), 
+        args.country.clone(), 
+        args.region.clone(), 
+        args.site.clone(), 
+        args.name.clone(),
+        String::new()
+    )
 }

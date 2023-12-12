@@ -10,7 +10,7 @@ const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 pub struct E4EDMConfig {
     config_path: std::path::PathBuf,
     pub active_dataset: Option<String>,
-    active_mission: Option<String>,
+    pub active_mission: Option<String>,
     pub datasets: HashMap<String, Dataset>,
     version: String,
     dataset_dir: Option<std::path::PathBuf>,
