@@ -3,8 +3,11 @@ use crate::config::E4EDMConfig;
 use anyhow::{Result, bail};
 use clap::Parser;
 
+static VERSION_STR: &str = concat!("\nversion: ", env!("CARGO_PKG_VERSION"), "\ngit hash: ", env!("GIT_HASH"), "\ncompile_time: ", env!("COMPILE_TIME"));
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
+#[command(long_version = VERSION_STR)]
 #[command(propagate_version = true)]
 pub struct Cli {
     #[command(subcommand)]
