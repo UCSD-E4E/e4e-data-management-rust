@@ -11,9 +11,9 @@ pub(crate) fn commit(args: &CommitArgs, config: &mut E4EDMConfig) -> Result<()> 
         bail!("Dataset not active");
     }
 
-    // Copies fles and directories in staging area to commited area
+    // Copies fles and directories from staging area to commited area
     let mut new_files = Vec::new(); 
-    let active_dataset = config.active_dataset.as_mut().unwrap()
+    let active_dataset = config.active_dataset.as_mut().unwrap();
     if args.readme {
         new_files = active_dataset.commit()?;
     } else {
