@@ -40,7 +40,7 @@ impl Dataset {
             metadata: metadata.clone(), 
             committed_files: vec![],
             staged_files: vec![],
-            manifest: Manifest::new(mission_path.join("manifest.json"), None)
+            manifest: Manifest::new(mission_path.clone().join("manifest.json"), Some(mission_path))
         });
 
         self.countries.insert(metadata.country.clone());
