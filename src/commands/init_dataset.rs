@@ -7,7 +7,7 @@ use super::InitDatasetArgs;
 
 pub(crate) fn init_dataset(args: &InitDatasetArgs, config: &mut E4EDMConfig) -> Result<()> {
     let manifest_root = args.path.to_owned()
-        .unwrap_or(ProjectDirs::from("com", "Engineers For Exploration", "E4EDataManagement").unwrap().config_dir().to_path_buf());
+        .unwrap_or(ProjectDirs::from("edu", "UCSD Engineers For Exploration", "E4EDataManagement").unwrap().config_dir().to_path_buf());
 
     let dataset_name = format!("{year:04}.{month:02}.{day:02}.{project}.{location}", 
         year = args.date.year(),

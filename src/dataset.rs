@@ -28,7 +28,7 @@ pub struct Dataset {
 }
 
 pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc>) -> Dataset {
-    let dataset_path = root.clone().join(name.clone());
+    let dataset_path = root.join(name.clone());
     Dataset {
         root: dataset_path,
         day_0,
