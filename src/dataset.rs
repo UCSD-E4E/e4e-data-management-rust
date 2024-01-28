@@ -3,7 +3,7 @@ use chrono::serde::ts_seconds;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::vec;
 
@@ -15,10 +15,10 @@ pub struct Dataset {
     last_country: Option<String>,
     last_region: Option<String>,
     last_site: Option<String>,
-    countries: Vec<String>,
-    regions: Vec<String>,
-    sites: Vec<String>,
-    devices: Vec<String>,
+    countries: HashSet<String>,
+    regions: HashSet<String>,
+    sites: HashSet<String>,
+    devices: HashSet<String>,
     missions: HashMap<String, Mission>,
     manifest: Manifest,
     committed_files: Vec<std::path::PathBuf>,
@@ -35,10 +35,10 @@ pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc
         last_country: None,
         last_region: None,
         last_site: None,
-        countries: vec![],
-        regions: vec![],
-        sites: vec![],
-        devices: vec![],
+        countries: HashSet::new(),
+        regions: HashSet::new(),
+        sites: HashSet::new(),
+        devices: HashSet::new(),
         missions: HashMap::new(),
         manifest: Manifest::new(PathBuf::from(name).join("manifest.json"), Some(root)),
         committed_files: vec![],
