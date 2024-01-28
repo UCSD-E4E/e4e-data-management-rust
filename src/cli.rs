@@ -14,7 +14,7 @@ pub struct Cli {
 impl Cli {
     pub fn exec(&self) -> Result<()> {
         let mut config = E4EDMConfig::build().unwrap();
-        let _ = match &self.command {
+        match &self.command {
             Commands::InitDataset(args) => init_dataset(args, &mut config),
             Commands::InitMission(args) => init_mission(args, &mut config),
             Commands::Add(args) => bail!("unimplemented"),
@@ -23,9 +23,9 @@ impl Cli {
             Commands::Config => bail!("unimplemented"),
             Commands::Commit(args) => bail!("unimplemented"),
             Commands::Push(args) => bail!("unimplemented"),
-        };
+        }?;
 
-        let _ = config.save();
+        config.save()?;
         Ok(())
     }
 }

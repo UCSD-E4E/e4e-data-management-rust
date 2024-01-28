@@ -116,6 +116,6 @@ pub fn build_mission_metadata(args: &InitMissionArgs) -> Metadata {
         args.region.clone(), 
         args.site.clone(), 
         args.name.clone(),
-        String::new()
+        args.message.clone().unwrap_or(String::new())
     )
 }
