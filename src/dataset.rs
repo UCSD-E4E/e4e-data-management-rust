@@ -67,10 +67,10 @@ impl Dataset {
             .root
             .clone()
             .join(format!("ED-{expedition_day:02}"))
-            .join(&metadata.name);
+            .join(&metadata.mission);
 
         self.missions.insert(
-            metadata.name.clone(),
+            metadata.mission.clone(),
             Mission {
                 path: mission_path.clone(),
                 metadata: metadata.clone(),
@@ -91,7 +91,7 @@ impl Dataset {
         self.last_site = Some(metadata.site);
         self.devices.insert(metadata.device);
 
-        metadata.name
+        metadata.mission
     }
 }
 
@@ -140,38 +140,46 @@ pub struct Metadata {
     country: String,
     region: String,
     site: String,
-    name: String,
+    mission: String,
     notes: String,
+    properties: serde_json::Value,
 }
 
-pub fn build_metadata(
+#[derive(Debug, Clone)]
+pub struct MetadataParams {
     timestamp: DateTime<FixedOffset>,
     device: String,
     country: String,
     region: String,
     site: String,
-    name: String,
+    mission: String,
     notes: String,
-) -> Metadata {
+    properties: serde_json::Value,
+}
+
+pub fn build_metadata(params: MetadataParams) -> Metadata {
     Metadata {
-        timestamp,
-        device,
-        country,
-        region,
-        site,
-        name,
-        notes,
+        timestamp: params.timestamp,
+        device: params.device,
+        country: params.country,
+        region: params.region,
+        site: params.site,
+        mission: params.mission,
+        notes: params.notes,
+        properties: params.properties,
     }
 }
 
 pub fn build_mission_metadata(args: &InitMissionArgs) -> Metadata {
-    build_metadata(
-        args.timestamp,
-        args.device.clone(),
-        args.country.clone(),
-        args.region.clone(),
-        args.site.clone(),
-        args.name.clone(),
-        args.message.clone().unwrap_or_default(),
-    )
+    let metadata_params = MetadataParams {
+        timestamp: args.timestamp,
+        device: args.device.clone(),
+        country: args.country.clone(),
+        region: args.region.clone(),
+        site: args.site.clone(),
+        mission: args.name.clone(),
+        notes: args.message.clone().unwrap_or_default(),
+        properties: args.properties.clone().unwrap_or_default(),
+    };
+    build_metadata(metadata_params)
 }
