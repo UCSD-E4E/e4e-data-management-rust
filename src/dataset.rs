@@ -13,7 +13,7 @@ fn serialize_timestamp<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result
 where
     S: Serializer,
 {
-    let s = date.to_rfc3339_opts(SecondsFormat::Secs, true);
+    let s = date.to_rfc3339_opts(SecondsFormat::Secs, false);
     serializer.serialize_str(&s)
 }
 
@@ -44,6 +44,10 @@ where
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Dataset {
     root: std::path::PathBuf,
+    #[serde(
+        serialize_with = "serialize_timestamp",
+        deserialize_with = "deserialize_timestamp"
+    )]
     day_0: DateTime<FixedOffset>,
     last_country: Option<String>,
     last_region: Option<String>,
