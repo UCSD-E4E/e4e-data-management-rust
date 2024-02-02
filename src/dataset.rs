@@ -31,17 +31,25 @@ pub struct Dataset {
 impl Dataset {
     pub fn add_mission(&mut self, metadata: Metadata) -> String {
         let expedition_day = (metadata.timestamp - self.day_0).num_days();
-        let mission_path = self.root.clone()
+        let mission_path = self
+            .root
+            .clone()
             .join(format!("ED-{expedition_day:02}"))
-            .join(metadata.name.to_string());
+            .join(&metadata.name);
 
-        self.missions.insert(metadata.name.clone(), Mission {
-            path: mission_path.clone(),
-            metadata: metadata.clone(), 
-            committed_files: vec![],
-            staged_files: vec![],
-            manifest: Manifest::new(mission_path.clone().join("manifest.json"), Some(mission_path))
-        });
+        self.missions.insert(
+            metadata.name.clone(),
+            Mission {
+                path: mission_path.clone(),
+                metadata: metadata.clone(),
+                committed_files: vec![],
+                staged_files: vec![],
+                manifest: Manifest::new(
+                    mission_path.clone().join("manifest.json"),
+                    Some(mission_path),
+                ),
+            },
+        );
 
         self.countries.insert(metadata.country.clone());
         self.last_country = Some(metadata.country);
@@ -72,7 +80,7 @@ pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc
         committed_files: vec![],
         staged_files: vec![],
         pushed: false,
-        version: "".to_string()
+        version: "".to_string(),
     }
 }
 
@@ -98,24 +106,33 @@ pub struct Metadata {
 }
 
 pub fn build_metadata(
-    timestamp: DateTime<Utc>, 
-    device: String, 
-    country: String, 
+    timestamp: DateTime<Utc>,
+    device: String,
+    country: String,
     region: String,
     site: String,
     name: String,
-    notes: String) -> Metadata {
-        Metadata { timestamp, device, country, region, site, name, notes }
+    notes: String,
+) -> Metadata {
+    Metadata {
+        timestamp,
+        device,
+        country,
+        region,
+        site,
+        name,
+        notes,
     }
+}
 
 pub fn build_mission_metadata(args: &InitMissionArgs) -> Metadata {
     build_metadata(
-        args.timestamp.into(), 
-        args.device.clone(), 
-        args.country.clone(), 
-        args.region.clone(), 
-        args.site.clone(), 
+        args.timestamp.into(),
+        args.device.clone(),
+        args.country.clone(),
+        args.region.clone(),
+        args.site.clone(),
         args.name.clone(),
-        args.message.clone().unwrap_or(String::new())
+        args.message.clone().unwrap_or_default(),
     )
 }

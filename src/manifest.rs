@@ -15,15 +15,14 @@ struct ManifestData {
 }
 
 impl Manifest {
+    #[allow(dead_code)]
+    // TODO: implement validate and remove this
     fn validate(&self) -> bool {
         true
     }
 
     pub fn new(path: std::path::PathBuf, root: Option<std::path::PathBuf>) -> Manifest {
-        Manifest {
-            path, 
-            root
-        }
+        Manifest { path, root }
     }
 
     // fn get_dict(&self) -> Result<Box<HashMap<std::path::PathBuf, ManifestData>>, Box<dyn Error>> {
