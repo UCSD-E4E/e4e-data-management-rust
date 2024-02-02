@@ -1,6 +1,6 @@
-use crate::commands::Commands;
+use crate::commands::{Commands, init_dataset::init_dataset, init_mission::init_mission};
 use crate::config::E4EDMConfig;
-use anyhow::Result;
+use anyhow::{Result, bail};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -13,19 +13,19 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(&self) -> Result<()> {
-        let config = E4EDMConfig::build().unwrap();
+        let mut config = E4EDMConfig::build().unwrap();
         match &self.command {
-            Commands::InitDataset(args) => {}
-            Commands::InitMission(args) => {}
-            Commands::Add(args) => {}
-            Commands::Activate => {}
-            Commands::Status => {}
-            Commands::Config => {}
-            Commands::Commit(args) => {}
-            Commands::Push(args) => {}
-        }
+            Commands::InitDataset(args) => init_dataset(args, &mut config),
+            Commands::InitMission(args) => init_mission(args, &mut config),
+            Commands::Add(args) => bail!("unimplemented"),
+            Commands::Activate => bail!("unimplemented"),
+            Commands::Status => bail!("unimplemented"),
+            Commands::Config => bail!("unimplemented"),
+            Commands::Commit(args) => bail!("unimplemented"),
+            Commands::Push(args) => bail!("unimplemented"),
+        }?;
 
-        let _ = config.save();
+        config.save()?;
         Ok(())
     }
 }
