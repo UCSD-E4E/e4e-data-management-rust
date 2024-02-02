@@ -1,52 +1,50 @@
 use crate::commands::InitMissionArgs;
 use crate::manifest::Manifest;
-use chrono::serde::ts_seconds;
-use chrono::DateTime;
-use chrono::Utc;
-use serde::de::Deserializer;
+use anyhow::Result;
+use chrono::{DateTime, FixedOffset, SecondsFormat};
+use serde::de;
+use serde::de::{Deserializer, Visitor};
 use serde::{Deserialize, Serialize, Serializer};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
-use std::str::FromStr;
-use std::vec;
+use std::{fmt, vec};
 
-// ISO8601 is a wrapper around DateTime<Utc> to provide custom serialization and deserialization.
-#[derive(Debug)]
-struct ISO8601(DateTime<Utc>);
-
-impl FromStr for ISO8601 {
-    type Err = chrono::ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.parse::<DateTime<Utc>>().map(ISO8601)
-    }
+fn serialize_timestamp<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let s = date.to_rfc3339_opts(SecondsFormat::Secs, true);
+    serializer.serialize_str(&s)
 }
 
-impl Serialize for ISO8601 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        // Serialize the date/time as a string in RFC 3339 format.
-        // serializer.serialize_newtype_struct("ISO8601", &self.0.to_rfc3339())
-        serializer.serialize_str(&self.0.to_rfc3339())
-    }
-}
+fn deserialize_timestamp<'de, D>(deserializer: D) -> Result<DateTime<FixedOffset>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    struct DateTimeVisitor;
 
-impl<'de> Deserialize<'de> for ISO8601 {
-    fn deserialize<D>(deserializer: D) -> Result<ISO8601, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        s.parse::<ISO8601>().map_err(serde::de::Error::custom)
+    impl<'de> Visitor<'de> for DateTimeVisitor {
+        type Value = DateTime<FixedOffset>;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("RFC3339 formatted string")
+        }
+
+        fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            DateTime::parse_from_rfc3339(value).map_err(de::Error::custom)
+        }
     }
+
+    deserializer.deserialize_str(DateTimeVisitor)
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Dataset {
     root: std::path::PathBuf,
-    day_0: ISO8601,
+    day_0: DateTime<FixedOffset>,
     last_country: Option<String>,
     last_region: Option<String>,
     last_site: Option<String>,
@@ -65,17 +63,25 @@ pub struct Dataset {
 impl Dataset {
     pub fn add_mission(&mut self, metadata: Metadata) -> String {
         let expedition_day = (metadata.timestamp - self.day_0).num_days();
-        let mission_path = self.root.clone()
+        let mission_path = self
+            .root
+            .clone()
             .join(format!("ED-{expedition_day:02}"))
-            .join(metadata.name.to_string());
+            .join(&metadata.name);
 
-        self.missions.insert(metadata.name.clone(), Mission {
-            path: mission_path.clone(),
-            metadata: metadata.clone(), 
-            committed_files: vec![],
-            staged_files: vec![],
-            manifest: Manifest::new(mission_path.clone().join("manifest.json"), Some(mission_path))
-        });
+        self.missions.insert(
+            metadata.name.clone(),
+            Mission {
+                path: mission_path.clone(),
+                metadata: metadata.clone(),
+                committed_files: vec![],
+                staged_files: vec![],
+                manifest: Manifest::new(
+                    mission_path.clone().join("manifest.json"),
+                    Some(mission_path),
+                ),
+            },
+        );
 
         self.countries.insert(metadata.country.clone());
         self.last_country = Some(metadata.country);
@@ -89,7 +95,11 @@ impl Dataset {
     }
 }
 
-pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc>) -> Dataset {
+pub fn build_dataset(
+    name: String,
+    root: std::path::PathBuf,
+    day_0: DateTime<FixedOffset>,
+) -> Dataset {
     let dataset_path = root.join(name.clone());
     Dataset {
         root: dataset_path,
@@ -106,7 +116,7 @@ pub fn build_dataset(name: String, root: std::path::PathBuf, day_0: DateTime<Utc
         committed_files: vec![],
         staged_files: vec![],
         pushed: false,
-        version: "".to_string()
+        version: "".to_string(),
     }
 }
 
@@ -121,8 +131,11 @@ struct Mission {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Metadata {
-    #[serde(with = "ts_seconds")]
-    timestamp: DateTime<Utc>,
+    #[serde(
+        serialize_with = "serialize_timestamp",
+        deserialize_with = "deserialize_timestamp"
+    )]
+    timestamp: DateTime<FixedOffset>,
     device: String,
     country: String,
     region: String,
@@ -132,24 +145,33 @@ pub struct Metadata {
 }
 
 pub fn build_metadata(
-    timestamp: DateTime<Utc>, 
-    device: String, 
-    country: String, 
+    timestamp: DateTime<FixedOffset>,
+    device: String,
+    country: String,
     region: String,
     site: String,
     name: String,
-    notes: String) -> Metadata {
-        Metadata { timestamp, device, country, region, site, name, notes }
+    notes: String,
+) -> Metadata {
+    Metadata {
+        timestamp,
+        device,
+        country,
+        region,
+        site,
+        name,
+        notes,
     }
+}
 
 pub fn build_mission_metadata(args: &InitMissionArgs) -> Metadata {
     build_metadata(
-        args.timestamp.into(), 
-        args.device.clone(), 
-        args.country.clone(), 
-        args.region.clone(), 
-        args.site.clone(), 
+        args.timestamp,
+        args.device.clone(),
+        args.country.clone(),
+        args.region.clone(),
+        args.site.clone(),
         args.name.clone(),
-        args.message.clone().unwrap_or(String::new())
+        args.message.clone().unwrap_or_default(),
     )
 }
