@@ -101,7 +101,7 @@ impl Dataset {
 
 pub fn build_dataset(
     name: String,
-    root: std::path::PathBuf,
+    root: &std::path::Path,
     day_0: DateTime<FixedOffset>,
 ) -> Dataset {
     let dataset_path = root.join(name.clone());
@@ -116,7 +116,10 @@ pub fn build_dataset(
         sites: HashSet::new(),
         devices: HashSet::new(),
         missions: HashMap::new(),
-        manifest: Manifest::new(PathBuf::from(name).join("manifest.json"), Some(root)),
+        manifest: Manifest::new(
+            PathBuf::from(name).join("manifest.json"),
+            Some(root.to_path_buf()),
+        ),
         committed_files: vec![],
         staged_files: vec![],
         pushed: false,

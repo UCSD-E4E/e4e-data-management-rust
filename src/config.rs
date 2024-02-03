@@ -3,7 +3,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -26,15 +26,22 @@ impl E4EDMConfig {
         Ok(())
     }
 
-    pub fn build() -> Result<E4EDMConfig> {
-        let config_path = PathBuf::from(".");
-        let config_file_path = config_path.join("config.toml");
+    pub fn build(manifest_path: &Path) -> Result<E4EDMConfig> {
+        // Check if .config directory exists
+        let config_path = manifest_path.join(".config");
+        if !config_path.exists() {
+            fs::create_dir_all(&config_path)?;
+        }
 
+        let config_file_path = manifest_path.join(".config/config.toml"); // Simplified path join
+
+        // Attempt to read the config file if it exists
         if config_file_path.exists() {
-            let config_str = fs::read_to_string(config_file_path)?;
+            let config_str = fs::read_to_string(&config_file_path)?;
             let config: E4EDMConfig = toml::from_str(&config_str)?;
             Ok(config)
         } else {
+            // Return a default config if the file does not exist
             Ok(E4EDMConfig {
                 config_path,
                 active_dataset: None,
