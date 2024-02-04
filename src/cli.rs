@@ -18,14 +18,14 @@ impl Cli {
     pub fn exec(&self) -> Result<()> {
         let config = E4EDMConfig::build().unwrap();
         match &self.command {
-            Commands::InitDataset(args) => {}
-            Commands::InitMission(args) => {}
-            Commands::Add(args) => {}
+            Commands::InitDataset(_args) => {}
+            Commands::InitMission(_args) => {}
+            Commands::Add(_args) => {}
             Commands::Activate => {}
             Commands::Status => {}
             Commands::Config => {}
-            Commands::Commit(args) => {}
-            Commands::Push(args) => {}
+            Commands::Commit(_args) => {}
+            Commands::Push(_args) => {}
         }
 
         let _ = config.save();
