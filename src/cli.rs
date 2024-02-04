@@ -3,7 +3,14 @@ use crate::config::E4EDMConfig;
 use anyhow::Result;
 use clap::Parser;
 
-static VERSION_STR: &str = concat!("\nversion: ", env!("CARGO_PKG_VERSION"), "\ngit hash: ", env!("GIT_HASH"), "\ncompile_time: ", env!("COMPILE_TIME"));
+static VERSION_STR: &str = concat!(
+    "\nversion: ",
+    env!("CARGO_PKG_VERSION"),
+    "\ngit hash: ",
+    env!("GIT_HASH"),
+    "\ncompile_time: ",
+    env!("COMPILE_TIME")
+);
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
