@@ -63,6 +63,8 @@ pub struct InitMissionArgs {
     /// Description of mission
     #[arg(long)]
     pub message: Option<String>,
+    #[arg(long)]
+    pub properties: Option<serde_json::Value>,
 }
 
 #[derive(Args, Debug)]

@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use anyhow::{bail, Result};
 
 use crate::{config::E4EDMConfig, dataset::build_mission_metadata};
 
