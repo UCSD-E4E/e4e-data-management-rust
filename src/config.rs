@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use serde_json;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
