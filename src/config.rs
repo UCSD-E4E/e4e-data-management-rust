@@ -20,7 +20,7 @@ pub struct E4EDMConfig {
 
 impl E4EDMConfig {
     pub fn save(&self) -> Result<()> {
-        let config_str = serde_json::to_string(&self)?;
+        let config_str = serde_json::to_string_pretty(&self)?;
 
         let config_path_with_file = self.config_path.join("config.json");
         fs::write(config_path_with_file, config_str)?;
