@@ -10,13 +10,34 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
 
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13-xlarge]
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Build
       run: cargo build --verbose
+
     - name: Run tests
       run: cargo test --verbose
+
+    - name: Rename binary
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          mv ./target/debug/e4e-data-management-rust.exe ./target/debug/e4e-data-management-rust-${{ matrix.os }}.exe
+        else
+          mv ./target/debug/e4e-data-management-rust ./target/debug/e4e-data-management-rust-${{ matrix.os }}
+        fi
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }}
+        path: ./target/debug/e4e-data-management-rust-${{ matrix.os }}*
