@@ -27,18 +27,14 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-    - name: Store git commit hash
-      run: |
-        commit_hash=$(git rev-parse --short HEAD)
-        echo "COMMIT_HASH=$commit_hash" >> $GITHUB_ENV
-
     - name: Rename binary
       shell: bash
       run: |
+        hash_short=${GITHUB_SHA:0:7}
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          mv ./target/debug/e4e-data-management-rust.exe ./target/debug/e4e-data-management-rust-${{ matrix.os }}-${{ env.COMMIT_HASH }}.exe
+          mv ./target/debug/e4e-data-management-rust.exe ./target/debug/e4e-data-management-rust-${{ matrix.os }}-$hash_short.exe
         else
-          mv ./target/debug/e4e-data-management-rust ./target/debug/e4e-data-management-rust-${{ matrix.os }}-${{ env.COMMIT_HASH }}
+          mv ./target/debug/e4e-data-management-rust ./target/debug/e4e-data-management-rust-${{ matrix.os }}-$hash_short
         fi
 
     - name: Upload Build Artifacts
