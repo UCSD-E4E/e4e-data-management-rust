@@ -2,21 +2,41 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
 
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+
     - name: Build
       run: cargo build --verbose
+
     - name: Run tests
       run: cargo test --verbose
+
+    - name: Rename binary
+      shell: bash
+      run: |
+        hash_short=${GITHUB_SHA:0:7}
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          mv ./target/debug/e4e-data-management-rust.exe ./target/debug/e4e-data-management-rust-${{ matrix.os }}-$hash_short.exe
+        else
+          mv ./target/debug/e4e-data-management-rust ./target/debug/e4e-data-management-rust-${{ matrix.os }}-$hash_short
+        fi
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.os }}
+        path: ./target/debug/e4e-data-management-rust-${{ matrix.os }}*
