@@ -16,6 +16,19 @@ pub struct E4EDMConfig {
     dataset_dir: Option<std::path::PathBuf>,
 }
 
+impl Default for E4EDMConfig {
+    fn default() -> Self {
+        E4EDMConfig {
+            config_path: std::path::PathBuf::new().join("."),
+            active_dataset: None,
+            active_mission: None,
+            datasets: HashMap::new(),
+            version: VERSION.to_string(),
+            dataset_dir: None,
+        }
+    }
+}
+
 impl E4EDMConfig {
     pub fn save(&self) -> Result<()> {
         let config_str = toml::to_string(&self)?;
@@ -26,13 +39,6 @@ impl E4EDMConfig {
     }
 
     pub fn build() -> Result<E4EDMConfig> {
-        Ok(E4EDMConfig {
-            config_path: std::path::PathBuf::new().join("."),
-            active_dataset: None,
-            active_mission: None,
-            datasets: HashMap::new(),
-            version: VERSION.to_string(),
-            dataset_dir: None,
-        })
+        Ok(E4EDMConfig::default())
     }
 }
