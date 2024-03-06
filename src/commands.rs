@@ -1,3 +1,6 @@
+pub mod init_dataset;
+pub mod init_mission;
+
 use chrono::{DateTime, FixedOffset};
 use clap::{Args, Subcommand};
 
@@ -60,6 +63,8 @@ pub struct InitMissionArgs {
     /// Description of mission
     #[arg(long)]
     pub message: Option<String>,
+    #[arg(long)]
+    pub properties: Option<serde_json::Value>,
 }
 
 #[derive(Args, Debug)]

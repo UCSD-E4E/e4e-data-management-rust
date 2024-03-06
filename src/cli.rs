@@ -1,10 +1,21 @@
-use crate::commands::Commands;
+use crate::commands::{init_dataset::init_dataset, init_mission::init_mission, Commands};
 use crate::config::E4EDMConfig;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::Parser;
+use directories::ProjectDirs;
+
+static VERSION_STR: &str = concat!(
+    "\nversion: ",
+    env!("CARGO_PKG_VERSION"),
+    "\ngit hash: ",
+    env!("GIT_HASH"),
+    "\ncompile_time: ",
+    env!("COMPILE_TIME")
+);
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
+#[command(long_version = VERSION_STR)]
 #[command(propagate_version = true)]
 pub struct Cli {
     #[command(subcommand)]
@@ -13,19 +24,24 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(&self) -> Result<()> {
-        let config = E4EDMConfig::build().unwrap();
-        match &self.command {
-            Commands::InitDataset(args) => {}
-            Commands::InitMission(args) => {}
-            Commands::Add(args) => {}
-            Commands::Activate => {}
-            Commands::Status => {}
-            Commands::Config => {}
-            Commands::Commit(args) => {}
-            Commands::Push(args) => {}
-        }
+        let project_dirs =
+            ProjectDirs::from("edu", "UCSD Engineers For Exploration", "E4EDataManagement")
+                .unwrap();
+        let manifest_root = project_dirs.config_dir();
 
-        let _ = config.save();
+        let mut config = E4EDMConfig::build(manifest_root).unwrap();
+        match &self.command {
+            Commands::InitDataset(args) => init_dataset(args, manifest_root, &mut config),
+            Commands::InitMission(args) => init_mission(args, &mut config),
+            Commands::Add(_args) => bail!("unimplemented"),
+            Commands::Activate => bail!("unimplemented"),
+            Commands::Status => bail!("unimplemented"),
+            Commands::Config => bail!("unimplemented"),
+            Commands::Commit(_args) => bail!("unimplemented"),
+            Commands::Push(_args) => bail!("unimplemented"),
+        }?;
+
+        config.save()?;
         Ok(())
     }
 }
