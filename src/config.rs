@@ -57,7 +57,7 @@ impl E4EDMConfig {
             // Return a default config if the file does not exist
             let mut config = E4EDMConfig::default();
             config.config_path = config_path;
-            Ok(config);
+            Ok(config)
         }
     }
 }
