@@ -17,6 +17,19 @@ pub struct E4EDMConfig {
     dataset_dir: Option<std::path::PathBuf>,
 }
 
+impl Default for E4EDMConfig {
+    fn default() -> Self {
+        E4EDMConfig {
+            config_path: std::path::PathBuf::new().join("."),
+            active_dataset: None,
+            active_mission: None,
+            datasets: HashMap::new(),
+            version: VERSION.to_string(),
+            dataset_dir: None,
+        }
+    }
+}
+
 impl E4EDMConfig {
     pub fn save(&self) -> Result<()> {
         let config_str = serde_json::to_string_pretty(&self)?;
@@ -42,14 +55,9 @@ impl E4EDMConfig {
             Ok(config)
         } else {
             // Return a default config if the file does not exist
-            Ok(E4EDMConfig {
-                config_path,
-                active_dataset: None,
-                active_mission: None,
-                datasets: HashMap::new(),
-                version: VERSION.to_string(),
-                dataset_dir: None,
-            })
+            let mut config = E4EDMConfig::default();
+            config.config_path = config_path;
+            Ok(config)
         }
     }
 }
