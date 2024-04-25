@@ -1,5 +1,6 @@
 pub mod init_dataset;
 pub mod init_mission;
+pub mod add;
 
 use chrono::{DateTime, FixedOffset};
 use clap::{Args, Subcommand};

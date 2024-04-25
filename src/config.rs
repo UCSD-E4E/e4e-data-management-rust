@@ -3,7 +3,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -37,6 +37,17 @@ impl E4EDMConfig {
         let config_path_with_file = self.config_path.join("config.json");
         fs::write(config_path_with_file, config_str)?;
         Ok(())
+    }
+
+    pub fn stage(&mut self, paths: &[PathBuf]) {
+        if let Some(dataset_name) = &self.active_dataset {
+            if let Some(dataset) = self.datasets.get_mut(dataset_name) {
+                dataset.stage(paths);
+                for path in paths {
+                    println!("Staged {}", path.display());
+                }
+            }
+        }
     }
 
     pub fn build(manifest_path: &Path) -> Result<E4EDMConfig> {

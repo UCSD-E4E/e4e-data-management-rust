@@ -1,24 +1,24 @@
-use super::InitDatasetArgs;
+use super::{AddArgs, InitDatasetArgs};
 use crate::{config::E4EDMConfig, dataset::build_dataset};
 use anyhow::{bail, Result};
-use chrono::Datelike;
+use chrono::{DateTime, FixedOffset};
 use std::fs;
 use std::path::Path;
 
-pub(crate) fn add(args: AddArgs) {
-    if self.active_dataset.is_none() {
-        panic!("Dataset not active");
+pub(crate) fn add(args: &AddArgs, config: &mut E4EDMConfig) -> Result<()> {
+    let Some(active_dataset_name) = config.active_dataset.clone() else {
+        bail!("Dataset not active");
+    };
+    if let Some(readme_path) = &args.readme {
+        config.stage(&args.paths);
+        config.save();
+        return Ok(());
     }
-    if let Some(readme_path) = args.readme {
-        self.active_dataset.stage(&args.paths);
-        self.save();
-        return;
-    }
+    let Some(active_mission_name) = config.active_mission.clone() else {
+        bail!("Mission not active");
+    };
+    config.stage(&args.paths);
+    config.save();
+    Ok(())
 
-    if self.active_mission.is_none() {
-        panic!("Mission not active");
-    }
-
-    self.active_mission.stage(&args.paths, args.destination.as_deref());
-    self.save();
 }

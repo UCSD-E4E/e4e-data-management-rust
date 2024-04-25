@@ -97,6 +97,12 @@ impl Dataset {
 
         metadata.mission
     }
+    pub fn stage(&mut self, paths: &[PathBuf]) {
+        self.staged_files.extend(paths.iter().cloned());
+        for path in paths {
+            println!("Staged {}", path.display());
+        }
+    }
 }
 
 pub fn build_dataset(

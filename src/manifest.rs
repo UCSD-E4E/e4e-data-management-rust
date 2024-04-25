@@ -27,4 +27,5 @@ impl Manifest {
     // fn get_dict(&self) -> Result<Box<HashMap<std::path::PathBuf, ManifestData>>, Box<dyn Error>> {
     //     Ok()
     // }
+    
 }

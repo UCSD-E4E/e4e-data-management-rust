@@ -1,4 +1,4 @@
-use crate::commands::{init_dataset::init_dataset, init_mission::init_mission, Commands};
+use crate::commands::{init_dataset::init_dataset, init_mission::init_mission, add::add, Commands};
 use crate::config::E4EDMConfig;
 use anyhow::{bail, Result};
 use clap::Parser;
@@ -33,7 +33,7 @@ impl Cli {
         match &self.command {
             Commands::InitDataset(args) => init_dataset(args, manifest_root, &mut config),
             Commands::InitMission(args) => init_mission(args, &mut config),
-            Commands::Add(_args) => bail!("unimplemented"),
+            Commands::Add(args) => add(args, &mut config),
             Commands::Activate => bail!("unimplemented"),
             Commands::Status => bail!("unimplemented"),
             Commands::Config => bail!("unimplemented"),
