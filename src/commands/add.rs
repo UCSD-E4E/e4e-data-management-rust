@@ -6,19 +6,25 @@ use std::fs;
 use std::path::Path;
 
 pub(crate) fn add(args: &AddArgs, config: &mut E4EDMConfig) -> Result<()> {
-    let Some(active_dataset_name) = config.active_dataset.clone() else {
+    if config.active_dataset.is_none() {
         bail!("Dataset not active");
     };
-    if let Some(readme_path) = &args.readme {
-        config.stage(&args.paths);
-        config.save();
-        return Ok(());
+    
+    if args.readme.is_some() {
+        if let Some(dataset_name) = &config.active_dataset {
+            if let Some(dataset) = config.datasets.get_mut(dataset_name) {
+                dataset.stage(&args.paths);
+                config.save()?;
+                return Ok(());
+            }
+        }
     }
-    let Some(active_mission_name) = config.active_mission.clone() else {
+    if config.active_mission.is_none() {
         bail!("Mission not active");
     };
+    
     config.stage(&args.paths);
-    config.save();
+    config.save()?;
     Ok(())
 
 }
